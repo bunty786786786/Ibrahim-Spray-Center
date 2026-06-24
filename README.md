@@ -62,7 +62,7 @@ https://bunty786786786.github.io/ibrahim-spray-center/
 ✅ **Rana Muhammad Tufail:** 0300-8166897  
 ✅ **Rana Javed:** 0300-8003422  
 ✅ **Rana Arshad:** 0308-4892390  
-   **Rana Hammad:** +4917623692682
+   **Rana Hammad Rehman :** +4917623692682
 All with **WhatsApp integration** - Click to message directly!
 
 ---
