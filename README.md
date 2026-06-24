@@ -312,7 +312,7 @@ Your website proudly shows:
 **On iPhone:**
 - Tap any phone number to **call instantly**
 - Tap **WhatsApp button** to message directly
-- Fill **contact form** to send message
+- Fill **contact form** to send Beautifull Massage
 
 ---
 
