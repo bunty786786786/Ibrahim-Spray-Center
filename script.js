@@ -1,36 +1,50 @@
 /* ===========================
-   JAVASCRIPT - Interactive Features
+   JAVASCRIPT - Complete Interactive Features
    =========================== */
 
-// Mobile Menu Toggle
+// Initialize on DOM Load
 document.addEventListener('DOMContentLoaded', function() {
+    initMobileMenu();
+    initSmoothScroll();
+    initIntersectionObserver();
+    initContactForm();
+    initScrollToTop();
+    initActiveNavLink();
+});
+
+/* ===========================
+   MOBILE MENU TOGGLE
+   =========================== */
+function initMobileMenu() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-menu a');
 
-    // Toggle menu
-    if (hamburger) {
-        hamburger.addEventListener('click', function() {
-            navMenu.classList.toggle('active');
-            hamburger.classList.toggle('active');
-        });
-    }
+    if (!hamburger) return;
 
-    // Close menu when link is clicked
+    hamburger.addEventListener('click', function() {
+        navMenu.classList.toggle('active');
+        hamburger.classList.toggle('active');
+    });
+
     navLinks.forEach(link => {
         link.addEventListener('click', function() {
             navMenu.classList.remove('active');
-            if (hamburger) {
-                hamburger.classList.remove('active');
-            }
+            hamburger.classList.remove('active');
         });
     });
+}
 
-    // Smooth scroll behavior
+/* ===========================
+   SMOOTH SCROLL NAVIGATION
+   =========================== */
+function initSmoothScroll() {
+    const navLinks = document.querySelectorAll('.nav-menu a, .product-link, [href^="#"]');
+
     navLinks.forEach(link => {
         link.addEventListener('click', function(e) {
             const href = this.getAttribute('href');
-            if (href.startsWith('#')) {
+            if (href && href.startsWith('#')) {
                 e.preventDefault();
                 const target = document.querySelector(href);
                 if (target) {
@@ -39,8 +53,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+}
 
-    // Intersection Observer for fade-in animations
+/* ===========================
+   INTERSECTION OBSERVER FOR ANIMATIONS
+   =========================== */
+function initIntersectionObserver() {
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -100px 0px'
@@ -54,103 +72,190 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
 
-    // Add fade-in-scroll class to elements
-    const fadeElements = document.querySelectorAll('.product-card, .contact-item');
+    const fadeElements = document.querySelectorAll(
+        '.product-card, .contact-item, .stat-card, .testimonial-card, .benefit-card, .gallery-item'
+    );
     fadeElements.forEach(el => {
         el.classList.add('fade-in-scroll');
         observer.observe(el);
     });
+}
 
-    // Contact Form Submission
+/* ===========================
+   CONTACT FORM HANDLING
+   =========================== */
+function initContactForm() {
     const contactForm = document.getElementById('contactForm');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+    if (!contactForm) return;
 
-            // Get form values
-            const formData = {
-                name: this.querySelector('input[type="text"]').value,
-                email: this.querySelector('input[type="email"]').value,
-                phone: this.querySelector('input[type="tel"]').value,
-                message: this.querySelector('textarea').value
-            };
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
 
-            // Validate form
-            if (!formData.name || !formData.email || !formData.phone || !formData.message) {
-                showAlert('Please fill in all fields', 'error');
-                return;
-            }
+        // Get form values
+        const name = document.getElementById('name').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('phone').value.trim();
+        const subject = document.getElementById('subject').value.trim();
+        const message = document.getElementById('message').value.trim();
 
-            // Validate email
-            if (!isValidEmail(formData.email)) {
-                showAlert('Please enter a valid email address', 'error');
-                return;
-            }
+        // Validate form
+        if (!name || !email || !phone || !subject || !message) {
+            showAlert('Please fill in all fields', 'error');
+            return;
+        }
 
-            // Show success message
-            showAlert('Message sent successfully! We will contact you soon.', 'success');
+        if (!isValidEmail(email)) {
+            showAlert('Please enter a valid email address', 'error');
+            return;
+        }
 
-            // Reset form
-            this.reset();
+        if (!isValidPhone(phone)) {
+            showAlert('Please enter a valid phone number', 'error');
+            return;
+        }
 
-            // In production, you would send this data to your server
-            console.log('Form Data:', formData);
+        // Show success message
+        showAlert('✓ Message sent successfully! We will contact you soon.', 'success');
+
+        // Log form data (in production, send to server)
+        console.log('Form Data:', {
+            name: name,
+            email: email,
+            phone: phone,
+            subject: subject,
+            message: message,
+            timestamp: new Date()
         });
-    }
 
-    // WhatsApp Click Handler
-    const whatsappNumbers = ['0300-8166897', '0300-8003422', '0308-4892390'];
-    const phoneElements = document.querySelectorAll('.contact-item p');
-    
-    phoneElements.forEach(el => {
-        if (el.textContent.includes('-')) {
-            el.style.cursor = 'pointer';
-            el.addEventListener('click', function() {
-                const phone = this.textContent.trim();
-                openWhatsApp(phone);
-            });
+        // Reset form
+        contactForm.reset();
+    });
+}
+
+/* ===========================
+   SCROLL TO TOP FUNCTIONALITY
+   =========================== */
+function initScrollToTop() {
+    const scrollToTopBtn = document.getElementById('scrollToTop');
+    if (!scrollToTopBtn) return;
+
+    window.addEventListener('scroll', function() {
+        if (window.pageYOffset > 300) {
+            scrollToTopBtn.classList.add('show');
+        } else {
+            scrollToTopBtn.classList.remove('show');
         }
     });
-});
 
-// Utility Functions
+    scrollToTopBtn.addEventListener('click', function() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+/* ===========================
+   ACTIVE NAVIGATION LINK
+   =========================== */
+function initActiveNavLink() {
+    window.addEventListener('scroll', function() {
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-menu a');
+
+        let current = '';
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            if (pageYOffset >= sectionTop - 200) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').slice(1) === current) {
+                link.classList.add('active');
+            }
+        });
+    });
+}
+
+/* ===========================
+   UTILITY FUNCTIONS
+   =========================== */
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
 
+function isValidPhone(phone) {
+    const phoneRegex = /^[\d\s\-\+\(\)]{7,}$/;
+    return phoneRegex.test(phone);
+}
+
 function showAlert(message, type = 'success') {
+    // Remove existing alert
+    const existingAlert = document.querySelector('.alert');
+    if (existingAlert) {
+        existingAlert.remove();
+    }
+
     // Create alert element
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${type}`;
-    alertDiv.textContent = message;
-    
-    // Add styles
-    const style = document.createElement('style');
+    alertDiv.innerHTML = `
+        <div class="alert-content">
+            <span class="alert-message">${message}</span>
+            <button class="alert-close" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+    `;
+
+    // Add styles if not already added
     if (!document.querySelector('style[data-alert-styles]')) {
+        const style = document.createElement('style');
         style.setAttribute('data-alert-styles', 'true');
         style.textContent = `
             .alert {
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                padding: 15px 25px;
-                border-radius: 8px;
-                color: white;
-                font-weight: 600;
                 z-index: 1000;
                 animation: slideInRight 0.3s ease;
                 max-width: 400px;
             }
 
-            .alert-success {
-                background-color: #2ecc71;
-                box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+            .alert-content {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 15px 25px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             }
 
-            .alert-error {
+            .alert-success .alert-content {
+                background-color: #2ecc71;
+            }
+
+            .alert-error .alert-content {
                 background-color: #e74c3c;
-                box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+            }
+
+            .alert-close {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 0 0 0 15px;
+                transition: all 0.3s ease;
+            }
+
+            .alert-close:hover {
+                transform: scale(1.2);
             }
 
             @keyframes slideInRight {
@@ -177,26 +282,42 @@ function showAlert(message, type = 'success') {
 
     document.body.appendChild(alertDiv);
 
-    // Remove after 3 seconds
+    // Auto remove after 4 seconds
     setTimeout(() => {
-        alertDiv.style.animation = 'slideInRight 0.3s ease reverse';
-        setTimeout(() => {
-            alertDiv.remove();
-        }, 300);
-    }, 3000);
+        if (alertDiv.parentElement) {
+            alertDiv.style.animation = 'slideInRight 0.3s ease reverse';
+            setTimeout(() => {
+                if (alertDiv.parentElement) {
+                    alertDiv.remove();
+                }
+            }, 300);
+        }
+    }, 4000);
 }
 
-function openWhatsApp(phone) {
-    // Remove formatting
-    const cleanPhone = phone.replace(/[-\s]/g, '');
-    // Assuming Pakistan country code
-    const whatsappLink = `https://wa.me/92${cleanPhone.substring(1)}?text=Hello%20Ibrahim%20Spray%20Center`;
+/* ===========================
+   WHATSAPP INTEGRATION
+   =========================== */
+function openWhatsApp(phoneNumber) {
+    const cleanPhone = phoneNumber.replace(/[-\s\(\)]/g, '');
+    const whatsappLink = `https://wa.me/${cleanPhone}?text=Hello%20Ibrahim%20Spray%20Center`;
     window.open(whatsappLink, '_blank');
 }
 
-// Sticky Navigation on Scroll
+/* ===========================
+   PHONE CALL HANDLER
+   =========================== */
+function callNumber(phoneNumber) {
+    window.location.href = `tel:${phoneNumber}`;
+}
+
+/* ===========================
+   STICKY NAVBAR ENHANCEMENT
+   =========================== */
 window.addEventListener('scroll', function() {
     const navbar = document.querySelector('.navbar');
+    if (!navbar) return;
+
     if (window.scrollY > 100) {
         navbar.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.2)';
     } else {
@@ -204,43 +325,109 @@ window.addEventListener('scroll', function() {
     }
 });
 
-// Active Navigation Link on Scroll
-window.addEventListener('scroll', function() {
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('.nav-menu a');
+/* ===========================
+   PRODUCT CARD CLICK HANDLER
+   =========================== */
+document.addEventListener('click', function(e) {
+    if (e.target.closest('.product-card')) {
+        const productCard = e.target.closest('.product-card');
+        const productName = productCard.querySelector('h3').textContent;
+        const message = `I'm interested in: ${productName}`;
+        console.log('Product selected:', productName);
+    }
+});
 
-    let current = '';
-    sections.forEach(section => {
-        const sectionTop = section.offsetTop;
-        const sectionHeight = section.clientHeight;
-        if (pageYOffset >= sectionTop - 200) {
-            current = section.getAttribute('id');
-        }
+/* ===========================
+   LAZY LOADING FOR IMAGES
+   =========================== */
+if ('IntersectionObserver' in window) {
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                if (img.dataset.src) {
+                    img.src = img.dataset.src;
+                    img.removeAttribute('data-src');
+                    img.classList.add('loaded');
+                }
+                observer.unobserve(img);
+            }
+        });
     });
 
-    navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href').slice(1) === current) {
-            link.classList.add('active');
+    document.querySelectorAll('img[data-src]').forEach(img => {
+        imageObserver.observe(img);
+    });
+}
+
+/* ===========================
+   PAGE LOAD ANIMATION
+   =========================== */
+window.addEventListener('load', function() {
+    document.body.style.opacity = '1';
+    console.log('Ibrahim Spray Center Website - Successfully Loaded! 🌾');
+    console.log('Website Version: 1.0');
+    console.log('Last Updated: 2024');
+});
+
+// Set initial opacity
+document.body.style.opacity = '0';
+document.body.style.transition = 'opacity 0.5s ease';
+
+/* ===========================
+   KEYBOARD SHORTCUTS
+   =========================== */
+document.addEventListener('keydown', function(event) {
+    // Escape key to close mobile menu
+    if (event.key === 'Escape') {
+        const navMenu = document.querySelector('.nav-menu');
+        const hamburger = document.querySelector('.hamburger');
+        if (navMenu && navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            if (hamburger) hamburger.classList.remove('active');
         }
+    }
+
+    // Ctrl/Cmd + Shift + C to call
+    if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === 'C') {
+        event.preventDefault();
+        callNumber('0300-8166897');
+    }
+});
+
+/* ===========================
+   PERFORMANCE MONITORING
+   =========================== */
+if (window.performance && window.performance.timing) {
+    window.addEventListener('load', function() {
+        const perfData = window.performance.timing;
+        const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+        console.log('Page Load Time:', pageLoadTime + 'ms');
+    });
+}
+
+/* ===========================
+   FORM FIELD AUTO-FOCUS
+   =========================== */
+const formInputs = document.querySelectorAll('.form-group input, .form-group textarea');
+formInputs.forEach(input => {
+    input.addEventListener('focus', function() {
+        this.parentElement.style.transform = 'scale(1.02)';
+    });
+
+    input.addEventListener('blur', function() {
+        this.parentElement.style.transform = 'scale(1)';
     });
 });
 
-// Add active link styling
-const style = document.createElement('style');
-style.textContent = `
-    .nav-menu a.active {
-        color: var(--accent-color);
-        border-bottom: 2px solid var(--accent-color);
-    }
-`;
-document.head.appendChild(style);
-
-// Counter Animation for Stats (if you add stats section)
+/* ===========================
+   COUNTER ANIMATION
+   =========================== */
 function animateCounter(element, target, duration = 2000) {
+    if (!element) return;
+
     let current = 0;
     const increment = target / (duration / 16);
-    
     const counter = setInterval(() => {
         current += increment;
         if (current >= target) {
@@ -252,28 +439,16 @@ function animateCounter(element, target, duration = 2000) {
     }, 16);
 }
 
-// Lazy Loading for Images (future enhancement)
-if ('IntersectionObserver' in window) {
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.classList.add('loaded');
-                observer.unobserve(img);
-            }
-        });
-    });
-
-    document.querySelectorAll('img[data-src]').forEach(img => imageObserver.observe(img));
-}
-
-// Print Friendly Function
+/* ===========================
+   PRINT FUNCTIONALITY
+   =========================== */
 function printPage() {
     window.print();
 }
 
-// Share Function
+/* ===========================
+   SHARE SOCIAL MEDIA
+   =========================== */
 function shareOnSocial(platform) {
     const url = window.location.href;
     const title = 'Ibrahim Spray Center - Agricultural Products';
@@ -290,7 +465,9 @@ function shareOnSocial(platform) {
             shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
             break;
         case 'whatsapp':
-            shareUrl = `https://wa.me/?text=${encodeURIComponent(title + ' ' + url)}`;
+            shareUrl = `https://wa.me/?text=${encodeURIComponent(title + ' - ' + url)}`;
+            break;
+        default:
             break;
     }
 
@@ -299,5 +476,26 @@ function shareOnSocial(platform) {
     }
 }
 
-// Initialize Page
-console.log('Ibrahim Spray Center Website - Loaded Successfully');
+/* ===========================
+   CONTACT BUTTON SHORTCUTS
+   =========================== */
+function quickContact(type = 'call') {
+    const mainNumber = '0300-8166897';
+
+    if (type === 'call') {
+        callNumber(mainNumber);
+    } else if (type === 'whatsapp') {
+        openWhatsApp(mainNumber);
+    }
+}
+
+/* ===========================
+   INITIALIZATION LOG
+   =========================== */
+console.log('╔════════════════════════════════════════╗');
+console.log('║  Ibrahim Spray Center Website         ║');
+console.log('║  Version: 1.0                         ║');
+console.log('║  Status: ✓ Ready                      ║');
+console.log('╚════════════════════════════════════════╝');
+console.log('Contact: 0300-8166897');
+console.log('Products: Seeds, Sprays, Fertilizers, Neem');
